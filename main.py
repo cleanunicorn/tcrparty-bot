@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import twitter
 import json
 import time
