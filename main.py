@@ -3,6 +3,8 @@ import twitter
 import json
 import time
 
+print("Start")
+
 tokens = {}
 with open("tokens.json") as f:
     tokens = f.read()
