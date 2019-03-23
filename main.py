@@ -26,7 +26,7 @@ while True:
     print("Getting direct messages")
     dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
     last_dm = dms["events"][0]
-    last_dm_id = last_dm["id"]  # TODO: Replace with correct key
+    last_dm_id = last_dm["id"]
 
     # Request tokens from faucet
     print("Sending 'faucet' to tcrpartyvip")
