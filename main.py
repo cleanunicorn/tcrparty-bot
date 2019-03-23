@@ -2,14 +2,15 @@ import twitter
 import json
 import time
 
+tokens = {}
 with open("tokens.json") as f:
     tokens = f.read()
-    tokens = json.load(tokens)
+    tokens = json.loads(tokens)
 
 api = twitter.Api(
     consumer_key=tokens["consumer_key"],
     consumer_secret=tokens["consumer_secret"],
-    access_token_key=tokens["access_token"],
+    access_token_key=tokens["access_token_key"],
     access_token_secret=tokens["access_token_secret"],
 )
 
