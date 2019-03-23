@@ -66,4 +66,5 @@ while True:
 
     if retry == False:
         print("Sleeping one day")
+        fib1, fib2 = 1, 1
         time.sleep(86400)  # Sleep 1 day
