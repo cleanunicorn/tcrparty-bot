@@ -15,6 +15,7 @@ api = twitter.Api(
 )
 
 print(api.VerifyCredentials())
+exit
 # {"id": 16133, "location": "Philadelphia", "name": "bear"}
 
 # Start
@@ -22,16 +23,21 @@ print(api.VerifyCredentials())
 # Wait for confirmation
 # End
 
+
+def fibonacci(a, b):
+    return (b, a + b)
+
+
 while True:
     fib1, fib2 = 1, 1
 
     # Get the latest message id
     dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
-    last_dm = dms[len(dms) - 1]
-    last_dm_id = last_dm["message_id"]  # TODO: Replace with correct key
+    last_dm = dms["events"][0]
+    last_dm_id = last_dm["id"]  # TODO: Replace with correct key
 
     # Request tokens from faucet
-    dm = api.PostDirectMessage("faucet", user_id="tcrparty", return_json=True)
+    dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
     print(dm)
 
     # Wait for message confirmation
@@ -45,23 +51,20 @@ while True:
         dms = api.GetDirectMessages(
             since_id=last_dm_id, skip_status=True, full_text=True, return_json=True
         )
-        dms = json.load(dms)
-        for dm in dms:
-            if dm["user_id"] == "tcrparty":  # TODO: Replace with user_id
+        for dm in dms["events"]:
+            if (
+                dm["message_create"]["sender_id"]
+                == "1029028522843627520"
+            ):  
                 replied = True
-                if dm["message"].find(
-                    "Your message is confirmed"
-                ):  # TODO: Replace with key and text
+                if dm["message_create"]["message_data"]['text'].find(
+                    "You got it."
+                ) != -1:
                     confirmed = True
-                if dm["message"].find(
-                    "Too early to send message"
-                ):  # TODO: Replace with key and text
+                if dm["message_create"]["message_data"]['text'].find(
+                    "Ack, I can only let you hit the faucet once per day."
+                ) != -1:
                     retry = True
 
     if retry == False:
         time.sleep(86400)  # Sleep 1 day
-
-
-def fibonacci(a, b):
-    return (b, a + b)
-
