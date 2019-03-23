@@ -15,13 +15,35 @@ api = twitter.Api(
 print(api.VerifyCredentials())
 # {"id": 16133, "location": "Philadelphia", "name": "bear"}
 
-dm = api.PostDirectMessage("faucet", user_id="tcrparty")
-print(dm.AsDict())
+# Start
+# Send message
+# Wait for confirmation
+# End
 
 while True:
+    # Get the latest message id
     dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
-    dms = json.load(dms)
-    for dm in dms:
-        # dm = dm.AsDict()
-        # dm['']
-        print(dm)
+    last_dm = dms[len(dms) - 1]
+    last_dm_id = last_dm['message_id'] # TODO: Replace with correct key
+
+    # Request tokens from faucet
+    dm = api.PostDirectMessage("faucet", user_id="tcrparty", return_json=True)
+    print(dm)
+
+    # Wait for message confirmation
+    replied = False
+    confirmed = False
+    retry = False
+    while replied == False:
+        dms = api.GetDirectMessages(since_id=last_dm_id, skip_status=True, full_text=True, return_json=True)
+        dms = json.load(dms)
+        for dm in dms:
+            if dm['user_id'] == 'tcrparty': # TODO: Replace with user_id
+                replied = True
+                if dm['message'].find("Your message is confirmed"): # TODO: Replace with key and text
+                    confirmed = True
+                if dm['message'].find("Too early to send message"):  # TODO: Replace with key and text
+                    retry = True
+
+    if retry == False:
+        break
