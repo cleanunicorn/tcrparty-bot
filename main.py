@@ -20,9 +20,8 @@ print(api.VerifyCredentials())
 def fibonacci(a, b):
     return (b, a + b)
 
+fib1, fib2 = 1, 1
 while True:
-    fib1, fib2 = 1, 1
-
     # Get the latest message id
     print("Getting direct messages")
     dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
