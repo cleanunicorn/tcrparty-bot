@@ -15,30 +15,22 @@ api = twitter.Api(
 )
 
 print(api.VerifyCredentials())
-exit
-# {"id": 16133, "location": "Philadelphia", "name": "bear"}
-
-# Start
-# Send message
-# Wait for confirmation
-# End
-
 
 def fibonacci(a, b):
     return (b, a + b)
-
 
 while True:
     fib1, fib2 = 1, 1
 
     # Get the latest message id
+    print("Getting direct messages")
     dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
     last_dm = dms["events"][0]
     last_dm_id = last_dm["id"]  # TODO: Replace with correct key
 
     # Request tokens from faucet
+    print("Sending 'faucet' to tcrpartyvip")
     dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
-    print(dm)
 
     # Wait for message confirmation
     replied = False
@@ -46,6 +38,7 @@ while True:
     retry = False
     while replied == False:
         fib1, fib2 = fibonacci(fib1, fib2)
+        print("Sleeping {} minutes".format(fib2))
         time.sleep(fib2 * 60)  # Sleep fibonacci minutes
 
         dms = api.GetDirectMessages(
@@ -57,14 +50,18 @@ while True:
                 == "1029028522843627520"
             ):  
                 replied = True
+                print("Found reply")
                 if dm["message_create"]["message_data"]['text'].find(
                     "You got it."
                 ) != -1:
                     confirmed = True
+                    print("Done")
                 if dm["message_create"]["message_data"]['text'].find(
                     "Ack, I can only let you hit the faucet once per day."
                 ) != -1:
                     retry = True
+                    print("Need to sleep a bit more")
 
     if retry == False:
+        print("Sleeping one day")
         time.sleep(86400)  # Sleep 1 day
