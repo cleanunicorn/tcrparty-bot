@@ -3,8 +3,9 @@ import twitter
 import json
 import time
 import re
+import logging
 
-print("Start")
+logging.info("Starting")
 
 tokens = {}
 with open("tokens.json") as f:
@@ -16,20 +17,21 @@ api = twitter.Api(
     consumer_secret=tokens["consumer_secret"],
     access_token_key=tokens["access_token_key"],
     access_token_secret=tokens["access_token_secret"],
+    sleep_on_rate_limit=True,
 )
 
-print(api.VerifyCredentials() is not None)
+logging.info(api.VerifyCredentials() is not None)
 
 retry_sleep = ("10", "seconds")
 while True:
     # Get the latest message id
-    print("Getting direct messages")
+    logging.info("Getting direct messages")
     dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
     last_dm = dms["events"][0]
     last_dm_id = last_dm["id"]
 
     # Request tokens from faucet
-    print("Sending 'faucet' to tcrpartyvip")
+    logging.info("Sending 'faucet' to tcrpartyvip")
     dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
     time.sleep(5) # Wait a few seconds for the reply
 
@@ -45,11 +47,11 @@ while True:
             if dm["message_create"]["sender_id"] == "1029028522843627520":
                 replied = True
                 message_text = dm["message_create"]["message_data"]["text"]
-                print("Found reply: {}".format(message_text))
+                logging.info("Found reply: {}".format(message_text))
                 if message_text.find("You got it.") != -1:
                     confirmed = True
                     retry_sleep = ('24', 'hours')
-                    print("Received tokens")
+                    logging.info("Received tokens")
 
                 regex_match_time = (
                     r"Try again ([0-9]+) (hours|minutes|seconds) from now."
@@ -58,11 +60,11 @@ while True:
                 if matches is not None:
                     retry = True
                     retry_sleep = matches.groups()
-                    print("Too early to get tokens")
+                    logging.info("Too early to get tokens")
                 
                 break
 
-    print("Sleeping {} {}".format(retry_sleep[0], retry_sleep[1]))
+    logging.info("Sleeping {} {}".format(retry_sleep[0], retry_sleep[1]))
     if retry_sleep[1] == "minutes":
         time.sleep(int(retry_sleep[0]) * 60)
     elif retry_sleep[1] == "hours":
