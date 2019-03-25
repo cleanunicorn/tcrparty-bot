@@ -5,6 +5,7 @@ import time
 import re
 import logging
 
+logging.basicConfig(level=logging.INFO)
 logging.info("Starting")
 
 tokens = {}
