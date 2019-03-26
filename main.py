@@ -34,41 +34,38 @@ while True:
     # Request tokens from faucet
     logging.info("Sending 'faucet' to tcrpartyvip")
     dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
-    time.sleep(5) # Wait a few seconds for the reply
+    time.sleep(60) # Wait for a reply
 
     # Wait for message confirmation
     replied = False
-    confirmed = False
-    retry = False
-    while replied == False:
-        dms = api.GetDirectMessages(
-            since_id=last_dm_id, skip_status=True, full_text=True, return_json=True
-        )
-        for dm in dms["events"]:
-            if dm["message_create"]["sender_id"] == "1029028522843627520":
+    dms = api.GetDirectMessages(
+        since_id=last_dm_id, skip_status=True, full_text=True, return_json=True
+    )
+    for dm in dms["events"]:
+        if dm["message_create"]["sender_id"] == "1029028522843627520":
+            message_text = dm["message_create"]["message_data"]["text"]
+            logging.info("Found reply: {}".format(message_text))
+            if message_text.find("You got it.") != -1:
                 replied = True
-                message_text = dm["message_create"]["message_data"]["text"]
-                logging.info("Found reply: {}".format(message_text))
-                if message_text.find("You got it.") != -1:
-                    confirmed = True
-                    retry_sleep = ('24', 'hours')
-                    logging.info("Received tokens")
+                retry_sleep = ('24', 'hours')
+                logging.info("Received tokens")
 
-                regex_match_time = (
-                    r"Try again ([0-9]+) (hours|minutes|seconds) from now."
-                )
-                matches = re.search(regex_match_time, message_text)
-                if matches is not None:
-                    retry = True
-                    retry_sleep = matches.groups()
-                    logging.info("Too early to get tokens")
-                
-                break
+            regex_match_time = (
+                r"Try again ([0-9]+) (hours|minutes|seconds) from now."
+            )
+            matches = re.search(regex_match_time, message_text)
+            if matches is not None:
+                replied = True
+                retry_sleep = matches.groups()
+                logging.info("Too early to get tokens")
+            
+        if replied is True:
+            break
 
     logging.info("Sleeping {} {}".format(retry_sleep[0], retry_sleep[1]))
     if retry_sleep[1] == "minutes":
-        time.sleep(int(retry_sleep[0]) * 60)
+        time.sleep(int(retry_sleep[0]) * 60 + 60)
     elif retry_sleep[1] == "hours":
         time.sleep(int(retry_sleep[0]) * 3600)
     elif retry_sleep[1] == "seconds":
-        time.sleep(int(retry_sleep[0]))
+        time.sleep(int(retry_sleep[0]) + 60)
