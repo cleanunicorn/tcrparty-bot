@@ -33,7 +33,7 @@ last_dm_id = last_dm["id"]
 # Request tokens from faucet
 logging.info("Sending 'faucet' to tcrpartyvip")
 dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
-time.sleep(60) # Wait for a reply
+time.sleep(5) # Wait for a reply
 
 # Wait for message confirmation
 replied = False
@@ -59,6 +59,7 @@ for dm in dms["events"]:
             logging.info("Too early to get tokens")
         
     if replied is True:
+        logging.info("Done reading messages")
         break
 
 logging.info("Sleeping {} {}".format(retry_sleep[0], retry_sleep[1]))
