@@ -24,28 +24,23 @@ api = twitter.Api(
 logging.info(api.VerifyCredentials() is not None)
 
 retry_sleep = ("10", "seconds")
-# Get the latest message id
-# logging.info("Getting direct messages")
-# dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
-# last_dm = dms["events"][0]
-# last_dm_id = last_dm["id"]
 
 # Request tokens from faucet
 logging.info("Sending 'faucet' to tcrpartyvip")
 dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
-time.sleep(10) # Wait for a reply
+time.sleep(3) # Wait for a reply
 
 # Parse message confirmation
-replied = False
 dms = api.GetDirectMessages(
     skip_status=True, full_text=True, return_json=True
 )
+last_dm_id = 0
 for dm in dms["events"]:
-    if dm["message_create"]["sender_id"] == "1029028522843627520":
+    if dm["message_create"]["sender_id"] == "1029028522843627520" and int(dm["id"]) > last_dm_id:
+        last_dm_id = int(dm["id"])
         message_text = dm["message_create"]["message_data"]["text"]
         logging.info("Found reply: {}".format(message_text))
         if message_text.find("You got it.") != -1:
-            replied = True
             retry_sleep = ('24', 'hours')
             logging.info("Received tokens")
 
@@ -54,18 +49,13 @@ for dm in dms["events"]:
         )
         matches = re.search(regex_match_time, message_text)
         if matches is not None:
-            replied = True
             retry_sleep = matches.groups()
             logging.info("Too early to get tokens")
         
-    if replied is True:
-        logging.info("Done reading messages")
-        break
-
 logging.info("Sleeping {} {}".format(retry_sleep[0], retry_sleep[1]))
 if retry_sleep[1] == "minutes" or retry_sleep[1] == "minute":
     time.sleep(int(retry_sleep[0]) * 60 + 60)
 elif retry_sleep[1] == "hours" or retry_sleep[1] == "hour":
-    time.sleep(int(retry_sleep[0]) * 3600 + 60)
+    time.sleep(int(retry_sleep[0]) * 3600)
 elif retry_sleep[1] == "seconds" or retry_sleep[1] == "second":
-    time.sleep(int(retry_sleep[0]) + 60)
+    time.sleep(int(retry_sleep[0]))
