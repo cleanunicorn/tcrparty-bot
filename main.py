@@ -25,20 +25,20 @@ logging.info(api.VerifyCredentials() is not None)
 
 retry_sleep = ("10", "seconds")
 # Get the latest message id
-logging.info("Getting direct messages")
-dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
-last_dm = dms["events"][0]
-last_dm_id = last_dm["id"]
+# logging.info("Getting direct messages")
+# dms = api.GetDirectMessages(skip_status=True, full_text=True, return_json=True)
+# last_dm = dms["events"][0]
+# last_dm_id = last_dm["id"]
 
 # Request tokens from faucet
 logging.info("Sending 'faucet' to tcrpartyvip")
 dm = api.PostDirectMessage("faucet", screen_name="tcrpartyvip", return_json=True)
-time.sleep(5) # Wait for a reply
+time.sleep(10) # Wait for a reply
 
-# Wait for message confirmation
+# Parse message confirmation
 replied = False
 dms = api.GetDirectMessages(
-    since_id=last_dm_id, skip_status=True, full_text=True, return_json=True
+    skip_status=True, full_text=True, return_json=True
 )
 for dm in dms["events"]:
     if dm["message_create"]["sender_id"] == "1029028522843627520":
