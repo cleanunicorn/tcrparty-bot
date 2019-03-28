@@ -50,7 +50,7 @@ for dm in dms["events"]:
             logging.info("Received tokens")
 
         regex_match_time = (
-            r"Try again ([0-9]+) (hours|minutes|seconds) from now."
+            r"Try again ([0-9]+) (hour|hours|minute|minutes|second|seconds) from now."
         )
         matches = re.search(regex_match_time, message_text)
         if matches is not None:
@@ -63,9 +63,9 @@ for dm in dms["events"]:
         break
 
 logging.info("Sleeping {} {}".format(retry_sleep[0], retry_sleep[1]))
-if retry_sleep[1] == "minutes":
+if retry_sleep[1] == "minutes" or retry_sleep[1] == "minute":
     time.sleep(int(retry_sleep[0]) * 60 + 60)
-elif retry_sleep[1] == "hours":
-    time.sleep(int(retry_sleep[0]) * 3600)
-elif retry_sleep[1] == "seconds":
+elif retry_sleep[1] == "hours" or retry_sleep[1] == "hour":
+    time.sleep(int(retry_sleep[0]) * 3600 + 60)
+elif retry_sleep[1] == "seconds" or retry_sleep[1] == "second":
     time.sleep(int(retry_sleep[0]) + 60)
