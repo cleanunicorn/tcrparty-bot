@@ -34,10 +34,11 @@ time.sleep(3) # Wait for a reply
 dms = api.GetDirectMessages(
     skip_status=True, full_text=True, return_json=True
 )
-last_dm_id = 0
+last_dm_timestamp = 0
 for dm in dms["events"]:
-    if dm["message_create"]["sender_id"] == "1029028522843627520" and int(dm["id"]) > last_dm_id:
-        last_dm_id = int(dm["id"])
+    dm_timestamp = int(dm['created_timestamp'])
+    if dm["message_create"]["sender_id"] == "1029028522843627520" and dm_timestamp > last_dm_timestamp:
+        last_dm_timestamp = dm_timestamp
         message_text = dm["message_create"]["message_data"]["text"]
         logging.info("Found reply: {}".format(message_text))
         if message_text.find("You got it.") != -1:
